@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#set -euo pipefail
+
+brew install pandoc
+
+tex_installer=~/Downloads/BasicTex.pkg
+if [[ ! -f $tex_installer ]]; then
+  curl -o $tex_installer -L http://tug.org/cgi-bin/mactex-download/BasicTeX.pkg
+fi
+open $tex_installer
+
+# We don't use the lm-math fonts, but apparently need them
+
+if ! command -v tlmgr &>/dev/null; then
+  # assume installed but not on PATH
+  tlmgr_path=$(dirname "$(find /usr/local -name tlmgr)")
+  export PATH="$tlmgr_path:$PATH"
+fi
+
+sudo tlmgr update --self
+sudo tlmgr install lm-math

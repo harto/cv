@@ -1,0 +1,34 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+## Usage:
+##   to-pdf MARKDOWN PDF
+##
+## Arguments:
+##   MARKDOWN  input file path, in Markdown format
+##   PDF       output file path
+
+if (( $# != 2 )); then
+  grep -E '^## ?' "${BASH_SOURCE[0]}" | cut -c4- >&2
+  exit 1
+fi
+
+markdown=$1
+pdf=$2
+
+find_xelatex() {
+  find /usr/local -name xelatex | head -n1
+}
+
+if ! command -v xelatex &>/dev/null; then
+  # assume installed but not on PATH
+  xelatex_path=$(dirname "$(find_xelatex)")
+  export PATH="$xelatex_path:$PATH"
+fi
+
+pandoc "$markdown" \
+  --pdf-engine=xelatex \
+  --variable mainfont=Helvetica \
+  --variable urlcolor=NavyBlue \
+  -V links-as-notes \
+  -o "$pdf"
